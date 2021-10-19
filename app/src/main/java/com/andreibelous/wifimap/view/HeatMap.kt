@@ -22,7 +22,6 @@ class HeatMap
         setWillNotDraw(false)
     }
 
-
     private var minLevel = Integer.MAX_VALUE
     private var maxLevel = Integer.MIN_VALUE
 
