@@ -57,7 +57,4 @@ dependencies {
 
     // math
     implementation 'io.github.ruozhuochen:savitzky-golay-filter:1.0.1'
-
-    // heat map
-    implementation 'ca.heartlandsoftware:androidheatmap:1.2.0'
 }

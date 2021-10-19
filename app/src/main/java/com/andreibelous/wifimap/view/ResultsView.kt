@@ -9,7 +9,6 @@ import android.graphics.drawable.shapes.OvalShape
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import ca.hss.heatmaplib.HeatMap
 import com.andreibelous.wifimap.R
 import com.andreibelous.wifimap.data.Signal
 
@@ -22,6 +21,7 @@ class ResultsView
 
     init {
         inflate(context, R.layout.layout_results_view, this)
+        setBackgroundColor(Color.WHITE)
     }
 
     var closeClickListener: (() -> Unit)? = null
@@ -38,22 +38,6 @@ class ResultsView
     private val heatMap = findViewById<HeatMap>(R.id.heat_map)
 
     fun bind(data: List<Signal>) {
-        val min = data.minByOrNull { it.level }?.level?.toDouble() ?: return
-        val max = data.maxByOrNull { it.level }?.level?.toDouble() ?: return
-
-        with(heatMap) {
-            clearData()
-            setMinimum(min)
-            setMaximum(max)
-
-            data.forEach {
-                heatMap.addData(
-                    HeatMap.DataPoint(it.point.x, it.point.y, it.level.toDouble())
-                )
-            }
-
-            forceRefreshOnWorkerThread()
-        }
-
+        heatMap.bind(data)
     }
 }

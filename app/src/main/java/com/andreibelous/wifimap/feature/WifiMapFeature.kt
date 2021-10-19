@@ -10,6 +10,8 @@ import com.badoo.mvicore.element.Reducer
 import com.badoo.mvicore.feature.BaseFeature
 import com.badoo.mvicore.feature.Feature
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class WifiMapFeature(
     private val dataSource: WifiSignalDataSource
@@ -68,7 +70,12 @@ class WifiMapFeature(
                     val copy = mutableListOf<Signal>()
                     copy.addAll(dataSource.scanned)
                     dataSource.stopScan()
-                    Effect.StageChanged(Stage.Finished(copy)).toObservable()
+                    Observable.fromCallable {
+                        copy.sortBy { it.level }
+                        copy
+                    }.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .map<Effect> { Effect.StageChanged(Stage.Finished(it)) }
                 }
 
                 is Wish.Init -> Effect.StageChanged(Stage.Init).toObservable()

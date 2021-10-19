@@ -28,7 +28,11 @@
         android:id="@+id/label_next_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center"
+        android:textSize="24dp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guideline" />
@@ -37,7 +41,10 @@
         android:id="@+id/button_done"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40dp"
+        android:layout_marginTop="16dp"
+        android:padding="8dp"
+        android:textAllCaps="false"
+        android:textSize="24dp"
         app:layout_constraintEnd_toEndOf="@id/label_next_action"
         app:layout_constraintStart_toStartOf="@id/label_next_action"
         app:layout_constraintTop_toBottomOf="@id/label_next_action" />
@@ -45,6 +52,7 @@
     <com.andreibelous.wifimap.view.ResultsView
         android:id="@+id/results_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

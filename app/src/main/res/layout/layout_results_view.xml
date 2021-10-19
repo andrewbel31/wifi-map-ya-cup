@@ -25,10 +25,8 @@
             app:srcCompat="@drawable/ic_baseline_close_24" />
     </FrameLayout>
 
-    <ca.hss.heatmaplib.HeatMap
+    <com.andreibelous.wifimap.view.HeatMap
         android:id="@+id/heat_map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
-
+        android:layout_height="match_parent" />
 </merge>

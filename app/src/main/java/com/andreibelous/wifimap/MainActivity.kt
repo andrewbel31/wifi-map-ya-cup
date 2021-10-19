@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.andreibelous.wifimap.data.WifiSignalDataSource
+import com.andreibelous.wifimap.feature.Stage
 import com.andreibelous.wifimap.feature.WifiMapFeature
 import com.andreibelous.wifimap.mapper.NewsToViewAction
 import com.andreibelous.wifimap.mapper.StateToViewModel
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private val fragment by lazy {
         supportFragmentManager.findFragmentById(R.id.ar_fragment)!!.cast<WIfiMapArFragment>()
     }
+    private var feature: WifiMapFeature? = null
 
     private val dataSource by lazy { WifiSignalDataSource(this) }
 
@@ -32,7 +34,10 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.CHANGE_NETWORK_STATE,
             Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE
         )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,11 +49,10 @@ class MainActivity : AppCompatActivity() {
         } else {
             permissionsGranted()
         }
-
     }
 
     private fun permissionsGranted() {
-        val feature = WifiMapFeature(dataSource)
+        val feature = WifiMapFeature(dataSource).also { this.feature = it }
         val view = MapView(this, { dataSource.setCurrentPosition(it) })
         Binder(CreateDestroyBinderLifecycle(lifecycle)).apply {
             bind(view to feature using UiEventToWish)
@@ -62,27 +66,30 @@ class MainActivity : AppCompatActivity() {
             permissions.any { ActivityCompat.shouldShowRequestPermissionRationale(this, it) }
 
         if (shouldShowRationale) {
-            dialog?.dismiss()
-            AlertDialog.Builder(this)
-                .setTitle("Нет необходимых разрешений")
-                .setMessage("Без этих разрешений приложение не сможет работать :(")
-                .setPositiveButton("дать разрешения") { _, _ ->
-                    dismissDialog()
-                    requestPermissions()
-                }
-                .setNegativeButton("отмена") { _, _ ->
-                    dismissDialog()
-                    finish()
-                }
-                .setCancelable(true)
-                .create()
-                .also { dialog = it }
-                .show()
-
+            showRationale()
             return
         }
 
         requestPermissions()
+    }
+
+    private fun showRationale() {
+        dialog?.dismiss()
+        AlertDialog.Builder(this)
+            .setTitle("Нет необходимых разрешений")
+            .setMessage("Без этих разрешений приложение не сможет работать :(")
+            .setPositiveButton("дать разрешения") { _, _ ->
+                dismissDialog()
+                requestPermissions()
+            }
+            .setNegativeButton("отмена") { _, _ ->
+                dismissDialog()
+                finish()
+            }
+            .setCancelable(true)
+            .create()
+            .also { dialog = it }
+            .show()
     }
 
     private fun requestPermissions() {
@@ -107,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         if (granted.containsAll(permissions.toList())) {
             permissionsGranted()
         } else {
-            finish()
+            showRationale()
         }
     }
 
@@ -116,6 +123,14 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat
                 .checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
         }
+
+    override fun onBackPressed() {
+        if (feature?.state?.stage is Stage.Finished) {
+            feature?.accept(WifiMapFeature.Wish.Init)
+        } else {
+            super.onBackPressed()
+        }
+    }
 
     override fun onDestroy() {
         dispose()
